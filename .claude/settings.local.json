@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx --yes create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --no-import-alias --turbopack)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --no-import-alias --turbopack)",
+      "Read(//c/Development/**)",
+      "Bash(mv waterbottleApp waterbottle-app-temp)",
+      "Bash(npx create-next-app@latest waterbottle-app-temp --typescript --tailwind --eslint --app --src-dir --no-import-alias --turbopack)",
+      "Bash(npx create-next-app@latest waterbottle-app --typescript --tailwind --eslint --app --src-dir --no-import-alias --turbopack)",
+      "Bash(mv c:/Development/waterbottleApp/SPEC.md c:/Development/waterbottle-app/SPEC.md)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "WebSearch",
+      "WebFetch(domain:hearthstonejson.com)",
+      "Bash(node -e *)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:hearthsim.io)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Skill(deep-research)",
+      "Skill(deep-research:*)",
+      "WebFetch(domain:hearthstone.blizzard.com)",
+      "WebFetch(domain:xn--3nu936d.xn--ur0a)",
+      "WebFetch(domain:hss.io)",
+      "Bash(gh search *)",
+      "Bash(curl -sL \"https://api.github.com/repos/HearthSim/hearthstone-deck-code/readme\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\('download_url',''\\)\\)\")",
+      "Bash(curl -sL \"https://raw.githubusercontent.com/HearthSim/hearthstone-deck-code/main/README.md\")"
+    ],
+    "additionalDirectories": [
+      "c:\\Development\\waterbottle-app"
+    ]
+  }
+}
