@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" auth status)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" repo create waterbottleApp --source=. --private=false --push --description \"Hearthstone Deck Builder - A Next.js app for browsing cards and managing decks\")",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" repo create waterbottleApp --source=. --public --push --description \"Hearthstone Deck Builder - A Next.js app for browsing cards and managing decks\")",
+      "Bash(curl -s \"https://api.hearthstonejson.com/v1/latest/enUS/cards.collectible.json\")",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(type\\(d\\), len\\(d\\) if isinstance\\(d,list\\) else 'not list'\\)\")",
+      "Bash(curl -s \"https://api.hearthstonejson.com/v1/latest/enUS/cards.json\")",
+      "Bash(curl -so /dev/null -w \"%{http_code}\" \"https://api.hearthstonejson.com/v1/latest/enUS/cards.collectible.json\")",
+      "WebFetch(domain:hearthstone.wiki.gg)",
+      "Bash(npx tsc *)",
+      "Bash(npx next *)",
+      "Bash(curl -s http://localhost:3001)",
+      "Bash(git stash *)",
+      "Bash(npx ts-node --esm -e ' *)",
+      "Bash(taskkill //PID 23236 //F)"
+    ]
+  }
+}
