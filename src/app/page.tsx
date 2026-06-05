@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { Search, Plus, Minus, Shuffle, X, Sparkles, Copy, Upload, Calculator, RotateCcw, Check, Coins, Gamepad2, PlusCircle, CheckCircle, FlipHorizontal } from "lucide-react";
-import { HS_Card, Deck, CardType, Rarity, ManaCost, GameSession, GameCard } from "@/lib/types";
-import { fetchCards, getCardImageUrl, filterCards, getRarityColor, getSetDisplayName, deckFromCode, deckToCode, isStandardLegal, ensureStandardSets } from "@/lib/hearthstone";
+import { HS_Card, Deck, CardType, Rarity, ManaCost, FormatFilter, GameSession, GameCard } from "@/lib/types";
+import { fetchCards, getCardImageUrl, filterCards, getRarityColor, getSetDisplayName, getAvailableSets, deckFromCode, deckToCode, isStandardLegal, ensureStandardSets } from "@/lib/hearthstone";
 import { loadDecks, saveDecks, loadActiveDeck, saveActiveDeck } from "@/lib/deckStorage";
 import { calculateManaCurveProbability, calculateDrawProbability, probabilityToOdds } from "@/lib/probability";
 import type { ManaBucket, BucketConstraint } from "@/lib/types";
@@ -105,10 +105,14 @@ function BrowseTab({ cards, onAddToDeck }: BrowseTabProps) {
   const [manaCost, setManaCost] = useState<ManaCost>("ALL");
   const [cardType, setCardType] = useState<CardType>("ALL");
   const [rarity, setRarity] = useState<Rarity>("ALL");
+  const [format, setFormat] = useState<FormatFilter>("STANDARD");
+  const [selectedSet, setSelectedSet] = useState("ALL");
+
+  const availableSets = useMemo(() => getAvailableSets(cards), [cards]);
 
   const filtered = useMemo(
-    () => filterCards(cards, { search, manaCost, cardType, rarity }),
-    [cards, search, manaCost, cardType, rarity]
+    () => filterCards(cards, { search, manaCost, cardType, rarity, format, set: selectedSet }),
+    [cards, search, manaCost, cardType, rarity, format, selectedSet]
   );
 
   return (
@@ -159,6 +163,25 @@ function BrowseTab({ cards, onAddToDeck }: BrowseTabProps) {
             <option value="EPIC">Epic</option>
             <option value="LEGENDARY">Legendary</option>
           </select>
+          <select
+            value={format}
+            onChange={(e) => setFormat(e.target.value as FormatFilter)}
+            className="bg-[#2d2d2d] border border-[#3d3d3d] rounded-lg px-3 py-2.5 text-sm text-[#f5f5f5] focus:outline-none focus:border-[#c9a227] transition-colors cursor-pointer"
+          >
+            <option value="ALL">Wild</option>
+            <option value="STANDARD">Standard</option>
+            <option value="WILD">All</option>
+          </select>
+          <select
+            value={selectedSet}
+            onChange={(e) => setSelectedSet(e.target.value)}
+            className="bg-[#2d2d2d] border border-[#3d3d3d] rounded-lg px-3 py-2.5 text-sm text-[#f5f5f5] focus:outline-none focus:border-[#c9a227] transition-colors cursor-pointer"
+          >
+            <option value="ALL">All Sets</option>
+            {availableSets.map(({ code, name }) => (
+              <option key={code} value={code}>{name}</option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -190,12 +213,10 @@ interface MyDeckTabProps {
   cards: HS_Card[];
   onUpdateDeck: (deck: Deck) => void;
   onMulligan: () => void;
-  hasMulliganed: boolean;
-  onResetMulligan: () => void;
   onImportCode: (cards: { [cardId: string]: number }, heroClass: string | null) => void;
 }
 
-function MyDeckTab({ deck, cards, onUpdateDeck, onMulligan, hasMulliganed, onResetMulligan, onImportCode }: MyDeckTabProps) {
+function MyDeckTab({ deck, cards, onUpdateDeck, onMulligan, onImportCode }: MyDeckTabProps) {
   const [editingName, setEditingName] = useState(false);
   const [deckName, setDeckName] = useState(deck.name);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -403,25 +424,10 @@ deckCards.forEach((c) => {
           {totalCards >= 10 && (
             <button
               onClick={onMulligan}
-              disabled={hasMulliganed}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                hasMulliganed
-                  ? "bg-[#3d3d3d] text-[#6B6B6B] cursor-not-allowed"
-                  : "bg-[#c9a227] hover:bg-[#e0b830] text-[#1a1a1a]"
-              }`}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-[#c9a227] hover:bg-[#e0b830] text-[#1a1a1a] transition-colors"
             >
               <Sparkles size={16} />
-              {hasMulliganed ? "Mulligan Used" : "Draw Opening Hand"}
-            </button>
-          )}
-          {hasMulliganed && (
-            <button
-              onClick={onResetMulligan}
-              className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-[#6B6B6B] hover:text-[#c9a227] transition-colors"
-              title="Reset Mulligan"
-            >
-              <RotateCcw size={12} />
-              Reset
+              Draw Opening Hand
             </button>
           )}
           <button
@@ -747,12 +753,12 @@ function MulliganModal({ hand, deckCards, allCards, onMulligan, onReplaceSelecte
     setSelectedCardIds(new Set());
   }
 
+  const actualHandSize = withCoin ? 4 : 3;
+
   function handleClose() {
     setSelectedCardIds(new Set());
     onClose();
   }
-
-  const actualHandSize = withCoin ? 4 : 3;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
@@ -845,12 +851,6 @@ function MulliganModal({ hand, deckCards, allCards, onMulligan, onReplaceSelecte
               Replace ({selectedCardIds.size})
             </button>
           )}
-          <button
-            onClick={handleClose}
-            className="px-5 py-2.5 bg-[#3d3d3d] hover:bg-[#4d4d4d] text-[#f5f5f5] rounded-lg text-sm font-medium transition-colors"
-          >
-            Keep This Hand
-          </button>
         </div>
       </div>
     </div>
@@ -1451,7 +1451,6 @@ export default function Home() {
     createdAt: Date.now(),
   });
   const [mulliganHand, setMulliganHand] = useState<HS_Card[] | null>(null);
-  const [hasMulliganed, setHasMulliganed] = useState(false);
 
   useEffect(() => {
     ensureStandardSets(); // Warm Standard sets cache from wiki (falls back to static list)
@@ -1506,16 +1505,20 @@ export default function Home() {
       return card;
     }).filter(Boolean);
     setMulliganHand(hand);
-    setHasMulliganed(true);
   }
 
   function replaceMulligan(
     currentHand: HS_Card[],
     cardsToReplace: HS_Card[]
   ): HS_Card[] {
-    // Cards being kept (not replaced)
+    // Track which indices in the hand are being replaced (preserves position)
     const replacedIdSet = new Set(cardsToReplace.map((c) => c.id));
-    const keptCards = currentHand.filter((c) => !replacedIdSet.has(c.id));
+    const replacedIndices: number[] = [];
+    for (let i = 0; i < currentHand.length; i++) {
+      if (replacedIdSet.has(currentHand[i].id)) {
+        replacedIndices.push(i);
+      }
+    }
 
     // Build remaining deck: all cards minus those currently in hand (whole hand goes back)
     const inHandSet = new Set(currentHand.map((c) => c.id));
@@ -1538,13 +1541,18 @@ export default function Home() {
     }
 
     // Draw replacement cards
-    const numToReplace = cardsToReplace.length;
-    const newDrawIds = flatDeck.slice(0, numToReplace);
+    const newDrawIds = flatDeck.slice(0, replacedIndices.length);
     const newDrawCards = newDrawIds
       .map((id) => cards.find((c) => c.id === id))
       .filter((c): c is HS_Card => c !== undefined);
 
-    return [...keptCards, ...newDrawCards];
+    // Build new hand: fill replaced indices with new cards in same positions
+    const newHand = [...currentHand];
+    for (let i = 0; i < replacedIndices.length; i++) {
+      newHand[replacedIndices[i]] = newDrawCards[i];
+    }
+
+    return newHand;
   }
 
   if (loading) {
@@ -1653,8 +1661,6 @@ export default function Home() {
             cards={cards}
             onUpdateDeck={updateDeck}
             onMulligan={drawMulligan}
-            hasMulliganed={hasMulliganed}
-            onResetMulligan={() => setHasMulliganed(false)}
             onImportCode={importDeckCode}
           />
         ) : (

@@ -33,16 +33,15 @@ src/
 ### My Deck Tab
 - **Deck header**: editable name, import/export deck codes, card count (x/30)
 - **Clear Deck button**: removes all cards from deck (with confirmation)
-- **Draw Opening Hand**: draws 3 or 4 random cards from deck (coin toggle), one-time use per session
-- **Reset Mulligan**: appears after mulligan used, allows drawing again
+- **Draw Opening Hand**: draws 3 or 4 random cards from deck (coin toggle), endlessly repeatable
 - **Mana Curve Analyzer** ("Calculator" button): bucket-based probability calculator
 
 ### Opening Hand Modal
 - **Coin toggle**: switch between 3-card and 4-card (with coin) hand sizes
 - **Card selection**: click any card to mark it for replacement (red X overlay)
-- **Replace (N)**: swaps selected cards with new draws from deck, keeps the rest
+- **Replace (N)**: swaps selected cards with new draws from deck, preserves card positions
 - **Draw Fresh Hand**: discards entire hand, draws a new one (respects coin toggle)
-- **Keep This Hand**: closes modal, keeps the current hand
+- **X button**: closes modal (no "keep" concept — endless rolling, no reset needed)
 
 ### Mana Curve Analyzer
 Replaces the old card-selecting mulligan calculator with a bucket-based approach.

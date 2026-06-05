@@ -1,0 +1,28 @@
+# Dependencies
+node_modules
+.npm
+
+# Next.js build artifacts
+.next
+out
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Git
+.git
+.gitignore
+
+# AWS / keys
+*.pem
+*.key
+
+# IDE
+.vscode
+.idea
+
+# Misc
+*.log
+README.md

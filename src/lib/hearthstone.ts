@@ -56,11 +56,15 @@ export function filterCards(
     manaCost,
     cardType,
     rarity,
+    format,
+    set,
   }: {
     search: string;
     manaCost: string;
     cardType: string;
     rarity: string;
+    format: string;
+    set: string;
   }
 ): HS_Card[] {
   return cards.filter((card) => {
@@ -74,8 +78,25 @@ export function filterCards(
     }
     if (cardType !== "ALL" && card.type !== cardType) return false;
     if (rarity !== "ALL" && card.rarity !== rarity) return false;
+    if (format === "STANDARD" && card.set && !isStandardLegal(card.set)) return false;
+    if (set !== "ALL" && card.set !== set) return false;
     return true;
   });
+}
+
+export function getAvailableSets(cards: HS_Card[]): Array<{ code: string; name: string }> {
+  const seen = new Set<string>();
+  const result: Array<{ code: string; name: string }> = [];
+  for (const card of cards) {
+    if (card.set && !seen.has(card.set)) {
+      seen.add(card.set);
+      const name = getSetDisplayName(card.set);
+      if (name) {
+        result.push({ code: card.set, name });
+      }
+    }
+  }
+  return result.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export function getRarityColor(rarity?: string): string {

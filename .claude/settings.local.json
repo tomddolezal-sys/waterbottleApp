@@ -24,7 +24,14 @@
       "Bash(gh search *)",
       "Bash(curl -sL \"https://api.github.com/repos/HearthSim/hearthstone-deck-code/readme\")",
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\('download_url',''\\)\\)\")",
-      "Bash(curl -sL \"https://raw.githubusercontent.com/HearthSim/hearthstone-deck-code/main/README.md\")"
+      "Bash(curl -sL \"https://raw.githubusercontent.com/HearthSim/hearthstone-deck-code/main/README.md\")",
+      "Bash(ssh -o ConnectTimeout=15 -i __TRACKED_VAR__/Downloads/MY-AWS-KEYPAIR.pem ec2-user@3.133.162.134 'cd ~/hearthstone-app && docker build --no-cache -t hearthstone-app . 2>&1 && docker stop hearthstone-app && docker rm hearthstone-app && docker run -d --name hearthstone-app -p 80:3000 --restart unless-stopped hearthstone-app && echo '\\\\''DEPLOY_SUCCESS'\\\\''')",
+      "Bash(ssh -o ConnectTimeout=15 -i __TRACKED_VAR__/Downloads/MY-AWS-KEYPAIR.pem ec2-user@3.133.162.134 'curl -s -o /dev/null -w '\\\\''%{http_code}'\\\\'' http://localhost:80/ && echo '\\\\'''\\\\'' && docker ps --format '\\\\''table {{.Names}}\\\\t{{.Status}}'\\\\''')",
+      "Bash(ssh -o ConnectTimeout=15 -i __TRACKED_VAR__/Downloads/MY-AWS-KEYPAIR.pem ec2-user@3.133.162.134 'echo '\\\\''/swapfile none swap sw 0 0'\\\\'' | sudo tee -a /etc/fstab && sudo swapon -a && echo '\\\\''Swap is now permanent'\\\\''')",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:/Development/waterbottleApp/deploy.ps1\")",
+      "Bash(ssh -i __TRACKED_VAR__/Downloads/MY-AWS-KEYPAIR.pem ec2-user@3.133.162.134 'cd ~/hearthstone-app && docker build -t hearthstone-app . 2>&1 | tail -50')",
+      "Bash(ssh -i __TRACKED_VAR__/Downloads/MY-AWS-KEYPAIR.pem ec2-user@3.133.162.134 'docker stop hearthstone-app 2>/dev/null; docker rm hearthstone-app 2>/dev/null; docker run -d --name hearthstone-app -p 80:3000 --restart unless-stopped hearthstone-app && echo '\\\\''Container started'\\\\''')",
+      "Bash(taskkill //F //IM node.exe)"
     ],
     "additionalDirectories": [
       "c:\\Development\\waterbottle-app"
